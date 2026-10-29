@@ -1,0 +1,790 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Release roadmap · Travel Point</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: editable vertical timeline on the left, sticky live result on the right; one column on phones.
+   Colors follow the Travel Point design system (light only, like the product). */
+:root{
+  color-scheme:light;
+  /* backgrounds */
+  --canvas:#F6F6F6; --surface:#FEFEFE; --inset:#F6F6F6; --inset-hover:#EDECED; --inset-pressed:#DAD9D9;
+  --accent:#C7F33C; --accent-hover:#B3E22B; --accent-pressed:#9DC626; --accent-soft:#F2FDDF;
+  --inverse:#231F20; --inverse-hover:#312C2E;
+  --success:#5FE858; --success-soft:#D1F3CD; --success-ring:#B5F3AF;
+  --warning:#FFB121; --warning-soft:#F9E3C5; --warning-ring:#FED7A0;
+  --info:#A18276; --info-soft:#FEEAE2; --info-ring:#EFD9D0;
+  /* foreground */
+  --fg:#231F20; --fg-2:#464243; --muted:#736F70; --disabled:#A09E9E; --on-accent:#405710; --on-inverse:#FFFFFF;
+  /* borders */
+  --border:#DAD9D9; --border-strong:#C5C3C4; --border-soft:#EDECED; --focus:#405710;
+  /* timeline phases */
+  --c-agency:#A18276; --r-agency:#EFD9D0;
+  --c-design:#FFB121; --r-design:#FED7A0;
+  --c-dev:#9DC626;    --r-dev:#D4F88C;
+  --c-qa:#231F20;     --r-qa:#DAD9D9;
+  --font:"Google Sans","Google Sans Text","e-Ukraine",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+img{max-width:100%}
+body{margin:0;background:var(--canvas);color:var(--fg);font-family:var(--font);font-size:14px;line-height:20px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1200px;margin:0 auto;padding-block:48px 120px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{margin:0;font-weight:500;text-wrap:balance}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-end;justify-content:space-between;margin-bottom:32px}
+.top-text{display:grid;gap:12px;max-width:640px;min-width:0}
+.kicker{font-size:13px;color:var(--muted)}
+h1{font-size:clamp(32px,4.4vw,44px);line-height:1.1;letter-spacing:-.02em}
+.lead{color:var(--fg-2);font-size:16px;line-height:24px;max-width:58ch}
+.savebox{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.status{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--fg-2)}
+.status::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--disabled);box-shadow:0 0 0 3px var(--border-soft);flex:none}
+.status.ok::before{background:var(--success);box-shadow:0 0 0 3px var(--success-ring)}
+.status.dirty::before{background:var(--warning);box-shadow:0 0 0 3px var(--warning-ring)}
+.status.info::before{background:var(--info);box-shadow:0 0 0 3px var(--info-ring)}
+.btn.inset{background:var(--inset)}
+.btn.inset:hover{background:var(--inset-hover)}
+.btn.inset:active{background:var(--inset-pressed)}
+a.btn{display:inline-flex;align-items:center;text-decoration:none}
+.howto{list-style:none;margin:0;padding:0;display:grid;gap:12px;counter-reset:h}
+.howto li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;align-items:start;color:var(--fg-2)}
+.howto li::before{counter-increment:h;content:counter(h);width:28px;height:28px;border-radius:50%;background:var(--inset);display:grid;place-items:center;font-size:13px;font-weight:500;color:var(--fg)}
+.howto li span{padding-top:4px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.copybox{width:100%;min-height:160px;border:0;border-radius:20px;background:var(--inset);color:var(--fg);font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;padding:14px}
+.btn{border:0;border-radius:999px;height:44px;padding:0 20px;font-size:14px;font-weight:500;cursor:pointer;background:var(--surface);color:var(--fg);transition:background .15s}
+.btn:hover{background:var(--inset-hover)}
+.btn:active{background:var(--inset-pressed)}
+.btn.primary{background:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{background:var(--accent-hover)}
+.btn.primary:active{background:var(--accent-pressed)}
+.btn:disabled,.btn.primary:disabled{background:var(--inset-hover);color:var(--disabled);cursor:default}
+
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);gap:24px;align-items:start}
+.summary{position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);display:grid;gap:16px}
+
+/* cards */
+.card{background:var(--surface);border-radius:32px;padding:28px;display:grid;gap:18px;min-width:0}
+
+/* result */
+.result{gap:4px}
+.eyebrow{font-size:13px;color:var(--muted)}
+.bigdate{font-size:clamp(40px,5vw,56px);line-height:1.05;letter-spacing:-.03em;font-weight:500;font-variant-numeric:tabular-nums;transition:opacity .25s ease;margin-top:4px}
+.bigdate.tick{opacity:.35;transition:none}
+.subline{color:var(--fg-2);font-size:14px;margin-top:8px}
+.note{border-radius:20px;padding:14px 16px;font-size:14px;line-height:20px;margin-top:16px;color:var(--fg)}
+.note.good{background:var(--success-soft)}
+.note.warn{background:var(--warning-soft)}
+.note .lbl{display:flex;align-items:center;gap:8px;font-weight:500;margin-bottom:4px}
+.note .lbl::before{content:"";width:8px;height:8px;border-radius:50%;flex:none}
+.note.good .lbl::before{background:var(--success);box-shadow:0 0 0 3px var(--success-ring)}
+.note.warn .lbl::before{background:var(--warning);box-shadow:0 0 0 3px var(--warning-ring)}
+
+/* gantt */
+.sect-title{font-size:16px;font-weight:500}
+.gantt{display:grid;gap:10px;font-size:12px;line-height:16px}
+.g-row{display:grid;grid-template-columns:108px minmax(0,1fr);gap:10px;align-items:center}
+.g-label{color:var(--fg-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-track{position:relative;height:16px;border-radius:999px;background:var(--inset)}
+.g-bar{position:absolute;top:0;bottom:0;border-radius:999px;background:var(--c);min-width:6px}
+.g-wait{position:absolute;top:7px;height:2px;background:repeating-linear-gradient(90deg,var(--disabled) 0 3px,transparent 3px 6px)}
+.g-now{position:absolute;top:-4px;bottom:-4px;width:1.5px;border-radius:1px;background:var(--fg);opacity:.35}
+.g-axis{position:relative;height:16px;color:var(--muted);font-variant-numeric:tabular-nums}
+.g-axis span{position:absolute;top:0;white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:12px;color:var(--fg-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--c)}
+.legend i.w{width:14px;height:2px;border-radius:0;background:repeating-linear-gradient(90deg,var(--disabled) 0 3px,transparent 3px 6px)}
+
+/* timeline */
+.tl{list-style:none;margin:0;padding:0;display:grid;gap:16px}
+.step{position:relative;display:grid;grid-template-columns:24px minmax(0,1fr);gap:16px}
+.step::before{content:"";position:absolute;left:11px;top:40px;bottom:-24px;width:2px;background:var(--border)}
+.step:last-child::before{display:none}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--c);box-shadow:0 0 0 4px var(--r);margin:32px 0 0 6px;position:relative;z-index:1}
+.step.final .dot{width:20px;height:20px;margin:28px 0 0 2px;background:var(--accent);box-shadow:0 0 0 4px var(--on-accent)}
+.step-head{display:grid;gap:10px;justify-items:start}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;line-height:16px;color:var(--fg-2);background:var(--inset);border-radius:999px;padding:4px 10px 4px 8px}
+.tag::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--c)}
+.step h3{font-size:20px;line-height:26px;letter-spacing:-.01em}
+.step-note{color:var(--fg-2);font-size:14px;max-width:60ch}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;line-height:16px;padding:6px 12px;border-radius:999px;background:var(--inset);color:var(--fg)}
+
+.fields{display:flex;flex-wrap:wrap;gap:16px 20px;align-items:flex-end}
+.field{display:grid;gap:6px;min-width:0}
+.field > label,.field > .flabel{font-size:13px;color:var(--muted)}
+.num{display:inline-flex;align-items:center;height:44px;border-radius:999px;background:var(--inset);padding:0 6px;transition:background .15s}
+.num:hover{background:var(--inset-hover)}
+.num input{width:72px;border:0;background:transparent;color:var(--fg);font:500 16px/1 var(--font);text-align:right;font-variant-numeric:tabular-nums;padding:0 4px;-moz-appearance:textfield;appearance:textfield}
+.num input.small{width:36px}
+.num input::-webkit-inner-spin-button,.num input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.num input:focus{outline:none}
+.num:focus-within{box-shadow:0 0 0 2px var(--focus)}
+.unit{font-size:14px;color:var(--muted);padding-right:4px}
+.stp{width:32px;height:32px;border:0;border-radius:50%;background:transparent;font-size:18px;line-height:1;cursor:pointer;color:var(--fg)}
+.stp:hover{background:var(--surface)}
+.stp:active{background:var(--inset-pressed)}
+input[type=date]{height:44px;border:0;border-radius:999px;background:var(--inset);color:var(--fg);font:500 15px var(--font);padding:0 16px;font-variant-numeric:tabular-nums;cursor:pointer}
+input[type=date]:hover{background:var(--inset-hover)}
+.sub{display:grid;gap:12px}
+.sub + .sub{border-top:1px solid var(--border-soft);padding-top:16px}
+.sub-title{font-size:14px;font-weight:500}
+
+.out{display:grid;gap:4px;padding:16px 18px;border-radius:24px;background:var(--inset)}
+.range{font-size:18px;line-height:24px;font-weight:500;font-variant-numeric:tabular-nums}
+.range .arr{color:var(--muted);font-weight:400;padding:0 6px}
+.calc{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.flag{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:12px;line-height:16px;border-radius:999px;padding:4px 10px 4px 8px;justify-self:start;color:var(--fg)}
+.flag::before{content:"";width:8px;height:8px;border-radius:50%}
+.flag.warn{background:var(--warning-soft)}
+.flag.warn::before{background:var(--warning)}
+.flag.good{background:var(--success-soft)}
+.flag.good::before{background:var(--success)}
+
+.final .card{background:var(--inverse);color:var(--on-inverse)}
+.final .tag{background:rgba(255,255,255,.1);color:var(--on-inverse)}
+.final .tag::before{background:var(--accent)}
+.final .range{font-size:32px;line-height:38px;letter-spacing:-.02em}
+.final .calc{color:rgba(255,255,255,.65)}
+
+/* segmented: filter-track style, selected item in lime */
+.seg{display:inline-flex;background:var(--inset);border-radius:999px;padding:4px;gap:2px}
+.seg label{position:relative;cursor:pointer}
+.seg input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.seg span{display:block;padding:8px 16px;border-radius:999px;font-size:14px;line-height:20px;color:var(--fg);transition:background .15s}
+.seg label:hover span{background:var(--inset-hover)}
+.seg input:checked + span{background:var(--accent);color:var(--on-accent)}
+.seg input:focus-visible + span{outline:2px solid var(--focus)}
+
+/* settings */
+.settings h2{font-size:20px;line-height:26px}
+.setrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 16px;align-items:center;padding:16px 0;border-top:1px solid var(--border-soft)}
+.setrow:first-of-type{border-top:0;padding-top:0}
+.setrow .t{font-weight:500}
+.setrow .d{font-size:13px;color:var(--muted);grid-column:1/-1}
+.rangewrap{display:flex;align-items:center;gap:14px;grid-column:1/-1}
+.rangewrap output{min-width:52px;height:32px;display:grid;place-items:center;border-radius:999px;background:var(--inset);font-weight:500;font-variant-numeric:tabular-nums}
+input[type=range]{--p:0%;flex:1;min-width:0;height:6px;border-radius:999px;-webkit-appearance:none;appearance:none;background:linear-gradient(to right,var(--accent-pressed) var(--p),var(--inset-pressed) var(--p));cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--surface);border:1px solid var(--border-strong);box-shadow:0 1px 3px rgba(35,31,32,.15)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--surface);border:1px solid var(--border-strong);box-shadow:0 1px 3px rgba(35,31,32,.15)}
+.switch{position:relative;width:48px;height:28px;flex:none}
+.switch input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;z-index:1}
+.switch span{position:absolute;inset:0;border-radius:999px;background:var(--inset-pressed);transition:background .2s}
+.switch span::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--surface);transition:transform .2s,background .2s}
+.switch input:checked + span{background:var(--accent)}
+.switch input:checked + span::after{transform:translateX(20px);background:var(--on-accent)}
+.switch input:focus-visible + span{outline:2px solid var(--focus);outline-offset:2px}
+.pausedates{display:flex;flex-wrap:wrap;gap:10px;align-items:center;grid-column:1/-1;font-size:14px;color:var(--muted)}
+
+/* phone bar */
+.mbar{position:fixed;left:0;right:0;bottom:0;z-index:5;padding-block:12px calc(12px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:rgba(254,254,254,.88);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-top:1px solid var(--border-soft);display:none;justify-content:space-between;align-items:center;gap:12px}
+.mbar span{font-size:13px;color:var(--muted)}
+.mbar strong{font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;background:var(--accent);color:var(--on-accent);border-radius:999px;padding:6px 14px}
+
+@media (max-width:999px){
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .summary{position:static;order:-1}
+  .mbar.on{display:flex}
+}
+@media (max-width:520px){
+  .wrap{padding-block:28px 110px}
+  .card{padding:22px 18px;border-radius:28px}
+  .step{grid-template-columns:16px minmax(0,1fr);gap:10px}
+  .step::before{left:7px}
+  .dot{margin-left:2px}
+  .step.final .dot{width:16px;height:16px;margin-left:0}
+  .g-row{grid-template-columns:88px minmax(0,1fr)}
+  .fields{gap:12px 14px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="top-text">
+      <p class="kicker">Travel Point Hotels · редизайн платформи</p>
+      <h1>Release roadmap</h1>
+      <p class="lead">Впишіть години, які назвуть дизайнер і розробники. Дата фіналу перерахується сама. Рахуємо робочі дні: 8 годин на день, 5 днів на тиждень.</p>
+    </div>
+    <div class="savebox">
+      <span class="status" id="saveStatus">Завантажуємо план…</span>
+      <button class="btn" id="revert" type="button" hidden>Повернути план</button>
+      <button class="btn primary" id="share" type="button">Скопіювати посилання на сценарій</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <main>
+      <ol class="tl">
+        <li class="step" style="--c:var(--c-agency);--r:var(--r-agency)">
+          <span class="dot"></span>
+          <div class="card">
+            <div class="step-head">
+              <span class="tag">Відомо · дизайн-агенція</span>
+              <h3>Агенція здає дизайн трьох сторінок</h3>
+              <p class="step-note">Головна, результати пошуку і сторінка готелю. Це перша точка, від якої рахуємо все інше.</p>
+            </div>
+            <div class="fields">
+              <div class="field"><label for="agencyDate">Дата здачі</label><input type="date" id="agencyDate" data-k="agencyDate"></div>
+            </div>
+            <div class="out" id="out-agency"></div>
+          </div>
+        </li>
+
+        <li class="step" style="--c:var(--c-design);--r:var(--r-design)">
+          <span class="dot"></span>
+          <div class="card">
+            <div class="step-head">
+              <span class="tag">Змінна X₁ · дизайнер на аутстафі</span>
+              <h3>Дизайн решти сторінок</h3>
+              <p class="step-note">Починається наступного робочого дня після агенції і йде паралельно з розробкою трьох сторінок.</p>
+            </div>
+            <div class="chips">
+              <span class="chip">Мої бронювання</span><span class="chip">Flow бронювання</span><span class="chip">Маркап: баланс субагентів</span><span class="chip">Кредитна лінія</span><span class="chip">Колекції</span><span class="chip">Обране</span><span class="chip">Налаштування</span><span class="chip">Кабінет</span><span class="chip">Лендінг, реєстрація й авторизація</span>
+            </div>
+            <div class="fields">
+              <div data-f="designHours|Години на всі сторінки|год|8|0"></div>
+              <div data-f="designPeople|Дизайнерів|люд.|1|1"></div>
+            </div>
+            <div class="out" id="out-design"></div>
+          </div>
+        </li>
+
+        <li class="step" style="--c:var(--c-dev);--r:var(--r-dev)">
+          <span class="dot"></span>
+          <div class="card">
+            <div class="step-head">
+              <span class="tag">Змінна X₂ · фронтенд і бекенд</span>
+              <h3>Розробка трьох сторінок</h3>
+              <p class="step-note">Верстаємо новий дизайн і адаптуємо бекенд. Частина бекенду вже працює на поточній платформі, тож рахуйте лише нову роботу.</p>
+            </div>
+            <div class="fields">
+              <div class="field"><label for="devStart">Старт розробки</label><input type="date" id="devStart" data-k="devStart"></div>
+              <div class="field">
+                <span class="flabel">Як рахувати години</span>
+                <div class="seg" role="radiogroup" aria-label="Як рахувати години розробки">
+                  <label><input type="radio" name="split" value="0" data-k="split"><span>Разом</span></label>
+                  <label><input type="radio" name="split" value="1" data-k="split"><span>Фронт і бек окремо</span></label>
+                </div>
+              </div>
+            </div>
+            <div class="sub" data-mode="total">
+              <div class="fields">
+                <div data-f="dev1Total|Години (фронт + бек)|год|8|0"></div>
+                <div data-f="dev1TotalPeople|Розробників|люд.|1|1"></div>
+              </div>
+            </div>
+            <div class="sub" data-mode="split">
+              <p class="sub-title">Фронтенд</p>
+              <div class="fields">
+                <div data-f="dev1Fe|Години|год|8|0"></div>
+                <div data-f="dev1FePeople|Людей|люд.|1|1"></div>
+              </div>
+            </div>
+            <div class="sub" data-mode="split">
+              <p class="sub-title">Бекенд</p>
+              <div class="fields">
+                <div data-f="dev1Be|Години|год|8|0"></div>
+                <div data-f="dev1BePeople|Людей|люд.|1|1"></div>
+              </div>
+            </div>
+            <div class="out" id="out-dev1"></div>
+          </div>
+        </li>
+
+        <li class="step" style="--c:var(--c-dev);--r:var(--r-dev)">
+          <span class="dot"></span>
+          <div class="card">
+            <div class="step-head">
+              <span class="tag">Змінна X₂ · фронтенд і бекенд</span>
+              <h3>Розробка решти сторінок</h3>
+              <p class="step-note">Стартує, коли виконано дві умови: команда закінчила три сторінки і дизайн решти готовий.</p>
+            </div>
+            <div class="sub" data-mode="total">
+              <div class="fields">
+                <div data-f="dev2Total|Години (фронт + бек)|год|8|0"></div>
+                <div data-f="dev2TotalPeople|Розробників|люд.|1|1"></div>
+              </div>
+            </div>
+            <div class="sub" data-mode="split">
+              <p class="sub-title">Фронтенд</p>
+              <div class="fields">
+                <div data-f="dev2Fe|Години|год|8|0"></div>
+                <div data-f="dev2FePeople|Людей|люд.|1|1"></div>
+              </div>
+            </div>
+            <div class="sub" data-mode="split">
+              <p class="sub-title">Бекенд</p>
+              <div class="fields">
+                <div data-f="dev2Be|Години|год|8|0"></div>
+                <div data-f="dev2BePeople|Людей|люд.|1|1"></div>
+              </div>
+            </div>
+            <div class="out" id="out-dev2"></div>
+          </div>
+        </li>
+
+        <li class="step" style="--c:var(--c-qa);--r:var(--r-qa)">
+          <span class="dot"></span>
+          <div class="card">
+            <div class="step-head">
+              <span class="tag">Після розробки</span>
+              <h3>Тестування і запуск</h3>
+              <p class="step-note">Перевірка всієї платформи, виправлення помилок і викладка. Поставте 0, якщо тестування вже входить у години розробки.</p>
+            </div>
+            <div class="fields">
+              <div data-f="qaHours|Години|год|8|0"></div>
+              <div data-f="qaPeople|Людей|люд.|1|1"></div>
+            </div>
+            <div class="out" id="out-qa"></div>
+          </div>
+        </li>
+
+        <li class="step final">
+          <span class="dot"></span>
+          <div class="card">
+            <div class="step-head">
+              <span class="tag">Фініш</span>
+              <h3>Платформа з новим дизайном готова</h3>
+            </div>
+            <div class="range" id="out-final"></div>
+            <p class="calc" id="out-final-calc"></p>
+          </div>
+        </li>
+      </ol>
+
+      <section class="card settings" style="margin-top:24px" aria-labelledby="setTitle">
+        <h2 id="setTitle">Робочий графік</h2>
+        <div>
+          <div class="setrow">
+            <span class="t">Годин у робочому дні</span>
+            <div data-f="hoursPerDay||год|1|1|small"></div>
+          </div>
+          <div class="setrow">
+            <span class="t">Робочих днів на тиждень</span>
+            <div class="seg" role="radiogroup" aria-label="Робочих днів на тиждень">
+              <label><input type="radio" name="dpw" value="5" data-k="daysPerWeek"><span>5</span></label>
+              <label><input type="radio" name="dpw" value="6" data-k="daysPerWeek"><span>6</span></label>
+            </div>
+          </div>
+          <div class="setrow">
+            <label class="t" for="buffer">Запас на ризики</label>
+            <span></span>
+            <div class="rangewrap"><input type="range" id="buffer" data-k="buffer" min="0" max="50" step="5"><output id="bufferOut" for="buffer"></output></div>
+            <span class="d">Додається до всіх годин. Хвороби, правки, затримки з відповідями: 15–20% зазвичай вистачає.</span>
+          </div>
+          <div class="setrow">
+            <label class="t" for="overlap">Розробку решти можна почати, коли готово</label>
+            <span></span>
+            <div class="rangewrap"><input type="range" id="overlap" data-k="overlap" min="25" max="100" step="5"><output id="overlapOut" for="overlap"></output></div>
+            <span class="d">100% означає: чекаємо весь дизайн. Менше: дизайнер віддає сторінки частинами, і розробка стартує раніше.</span>
+          </div>
+          <div class="setrow">
+            <label class="t" for="pause">Пауза команди</label>
+            <label class="switch"><input type="checkbox" id="pause" data-k="pause"><span></span></label>
+            <div class="pausedates" id="pauseDates">
+              <span>з</span><input type="date" id="pauseFrom" data-k="pauseFrom" aria-label="Пауза з">
+              <span>до</span><input type="date" id="pauseTo" data-k="pauseTo" aria-label="Пауза до">
+            </div>
+            <span class="d">Наприклад, новорічні дні. Під час воєнного стану державні свята в Україні робочі, тож за замовчуванням паузи немає.</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card settings" style="margin-top:24px" aria-labelledby="updTitle">
+        <h2 id="updTitle">Як оновити план для всіх</h2>
+        <p class="step-note">Цифри на сторінці беруться з файлу plan.json у репозиторії. Ваші зміни тут бачите лише ви, доки не оновите файл.</p>
+        <ol class="howto">
+          <li><span>Змініть години й дати на цій сторінці.</span></li>
+          <li><span>Натисніть «Скопіювати plan.json».</span></li>
+          <li><span>Відкрийте plan.json на GitHub, замініть весь вміст скопійованим і натисніть Commit changes. Сайт оновиться за кілька хвилин.</span></li>
+        </ol>
+        <div class="actions">
+          <button class="btn inset" id="copyPlan" type="button">Скопіювати plan.json</button>
+          <a class="btn inset" href="https://github.com/alisa-product/release-roadmap/edit/main/plan.json" target="_blank" rel="noopener">Відкрити plan.json на GitHub ↗</a>
+        </div>
+        <textarea class="copybox" id="copyBox" readonly hidden aria-label="Вміст для копіювання"></textarea>
+      </section>
+    </main>
+
+    <aside class="summary">
+      <section class="card result" id="resultCard">
+        <p class="eyebrow">Платформа з новим дизайном буде готова орієнтовно</p>
+        <p class="bigdate" id="bigDate">…</p>
+        <p class="subline" id="subLine"></p>
+        <div class="note" id="insight"></div>
+      </section>
+
+      <section class="card">
+        <p class="sect-title">Як ідуть роботи</p>
+        <div class="gantt" id="gantt"></div>
+        <div class="legend">
+          <span><i style="--c:var(--c-agency)"></i>Агенція</span>
+          <span><i style="--c:var(--c-design)"></i>Дизайн</span>
+          <span><i style="--c:var(--c-dev)"></i>Розробка</span>
+          <span><i style="--c:var(--c-qa)"></i>Тестування</span>
+          <span><i class="w"></i>Очікування</span>
+        </div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<div class="mbar" id="mbar"><span>Готово орієнтовно</span><strong id="mbarDate"></strong></div>
+
+<script>
+(function(){
+  var LS = "tp-redesign-roadmap-draft";
+  var DEFAULTS = {
+    agencyDate:"2026-11-19", devStart:"2026-12-01",
+    designHours:240, designPeople:1,
+    split:0,
+    dev1Total:480, dev1TotalPeople:2, dev1Fe:320, dev1FePeople:1, dev1Be:160, dev1BePeople:1,
+    dev2Total:960, dev2TotalPeople:2, dev2Fe:640, dev2FePeople:1, dev2Be:320, dev2BePeople:1,
+    qaHours:80, qaPeople:1,
+    hoursPerDay:8, daysPerWeek:5, buffer:0, overlap:100,
+    pause:false, pauseFrom:"2026-12-31", pauseTo:"2027-01-01"
+  };
+  var KEYS = Object.keys(DEFAULTS);
+  var GEN = ["січня","лютого","березня","квітня","травня","червня","липня","серпня","вересня","жовтня","листопада","грудня"];
+  var SHORT = ["січ","лют","бер","квіт","трав","черв","лип","серп","вер","жовт","лист","груд"];
+  var now = new Date();
+  var TODAY = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 12);
+
+  function merge(v){ var o = {}; KEYS.forEach(function(k){ o[k] = (v && v[k] !== undefined) ? v[k] : DEFAULTS[k]; }); return o; }
+  function same(a,b){ return KEYS.every(function(k){ return String(a[k]) === String(b[k]); }); }
+  function num(x){ var n = Number(x); return isFinite(n) ? n : 0; }
+  function pad(n){ return String(n).padStart(2,"0"); }
+  function D(s){ if(!s) return null; var p = String(s).split("-").map(Number); if(p.length<3||!p[0]) return null; return new Date(p[0], p[1]-1, p[2], 12); }
+  function add(d,n){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()+n, 12); }
+  function pl(n,f){ n = Math.abs(n) % 100; var n1 = n % 10; if(n>10 && n<20) return f[2]; if(n1>1 && n1<5) return f[1]; if(n1===1) return f[0]; return f[2]; }
+  function fmt(d, forceYear){ if(!d) return "немає"; return d.getDate()+" "+GEN[d.getMonth()]+((forceYear || d.getFullYear()!==TODAY.getFullYear()) ? " "+d.getFullYear() : ""); }
+  function wdays(n){ return n+" "+pl(n,["робочий день","робочі дні","робочих днів"]); }
+  function weeks(n){ return n+" "+pl(n,["тиждень","тижні","тижнів"]); }
+
+  /* ---------- model ---------- */
+  function compute(s){
+    var hpd = Math.max(1, num(s.hoursPerDay));
+    var buf = 1 + Math.max(0, num(s.buffer))/100;
+    var dpw = num(s.daysPerWeek) === 6 ? 6 : 5;
+    var pf = D(s.pauseFrom), pt = D(s.pauseTo);
+    function isWork(d){
+      var w = d.getDay();
+      if(w===0) return false;
+      if(w===6 && dpw<6) return false;
+      if(s.pause && pf && pt && d>=pf && d<=pt) return false;
+      return true;
+    }
+    function nextW(d){ var i=0; while(!isWork(d) && i++<400) d = add(d,1); return d; }
+    function after(d){ return nextW(add(d,1)); }
+    function run(start,n){ var d = nextW(start), first = d, last = null; n = Math.min(n, 3000); for(var i=0;i<n;i++){ last = d; d = after(d); } return {start:first, end:last, next:d, days:n}; }
+    function count(a,b){ var n=0, d=nextW(a); while(d<b && n<3000){ n++; d = after(d); } return n; }
+    function ppl(p){ return Math.max(1, Math.round(num(p)) || 1); }
+    function dd(h,p){ h = Math.max(0, num(h)); return Math.ceil(h*buf/(hpd*ppl(p)) - 1e-9); }
+    function dev(k){
+      if(Number(s.split)===1){ var fe = dd(s[k+"Fe"], s[k+"FePeople"]), be = dd(s[k+"Be"], s[k+"BePeople"]); return {fe:fe, be:be, len:Math.max(fe,be)}; }
+      var all = dd(s[k+"Total"], s[k+"TotalPeople"]); return {all:all, len:all};
+    }
+    var agency = D(s.agencyDate) || TODAY;
+    var designDays = dd(s.designHours, s.designPeople);
+    var design = run(add(agency,1), designDays);
+    var d1 = dev("dev1"), d2 = dev("dev2");
+    var dev1 = run(D(s.devStart) || add(agency,1), d1.len);
+    var ov = Math.min(100, Math.max(0, num(s.overlap)));
+    var gate = ov>=100 ? design.next : run(design.start, Math.ceil(designDays*ov/100)).next;
+    var dev2 = run(dev1.next > gate ? dev1.next : gate, d2.len);
+    if(design.end && dev2.end && dev2.end < design.end){ dev2.end = design.end; dev2.next = after(design.end); dev2.stretched = true; }
+    var qa = run(dev2.next, dd(s.qaHours, s.qaPeople));
+    var final = qa.end || dev2.end || dev1.end || design.end || agency;
+    var lastDesign = design.end || agency;
+    if(final < lastDesign) final = lastDesign;
+    return {
+      hpd:hpd, buf:buf, dpw:dpw, agency:agency, design:design, dev1:dev1, dev2:dev2, qa:qa, final:final, d1:d1, d2:d2,
+      wait: count(dev1.next, dev2.start),
+      lead: design.next < dev1.next ? count(design.next, dev1.next) : 0,
+      total: count(after(agency), after(final)),
+      ppl:ppl
+    };
+  }
+
+  /* ---------- state ---------- */
+  var S = merge(DEFAULTS);
+  var shared = null;      // {values, updatedAt} once plan.json is loaded
+  var planReady = false, planFailed = false, fromLink = false;
+  var draftBase = null, hadDraft = false;
+
+  // a scenario link (?designHours=300&...) wins over a local draft
+  function parseLink(){
+    var q; try { q = new URLSearchParams(location.search); } catch(e){ return null; }
+    var o = {}, any = false;
+    KEYS.forEach(function(k){
+      if(!q.has(k)) return;
+      var v = q.get(k), d = DEFAULTS[k]; any = true;
+      o[k] = typeof d === "number" ? num(v) : typeof d === "boolean" ? (v === "1" || v === "true") : v;
+    });
+    return any ? o : null;
+  }
+  var linked = parseLink();
+  if(linked){ S = merge(linked); fromLink = true; }
+  else {
+    try {
+      var raw = localStorage.getItem(LS);
+      if(raw){ var l = JSON.parse(raw); if(l && l.values){ S = merge(l.values); draftBase = l.basedOn || null; hadDraft = true; } }
+    } catch(e){}
+  }
+  function persistLocal(){ try { localStorage.setItem(LS, JSON.stringify({values:S, basedOn: shared ? shared.updatedAt : null})); } catch(e){} }
+  function isDirty(){ return shared ? !same(S, shared.values) : true; }
+
+  /* ---------- fields ---------- */
+  document.querySelectorAll("[data-f]").forEach(function(ph){
+    var p = ph.getAttribute("data-f").split("|");
+    var k = p[0], label = p[1], unit = p[2], step = p[3], min = p[4], cls = p[5] || "";
+    var el = document.createElement("div");
+    el.className = "field";
+    el.innerHTML =
+      (label ? '<label for="'+k+'">'+label+'</label>' : '') +
+      '<div class="num">' +
+        '<button type="button" class="stp" data-for="'+k+'" data-d="-'+step+'" aria-label="Менше">−</button>' +
+        '<input id="'+k+'" data-k="'+k+'" type="number" inputmode="numeric" min="'+min+'" step="'+step+'" class="'+cls+'"'+(label ? '' : ' aria-label="'+unit+'"')+'>' +
+        '<span class="unit">'+unit+'</span>' +
+        '<button type="button" class="stp" data-for="'+k+'" data-d="'+step+'" aria-label="Більше">+</button>' +
+      '</div>';
+    ph.replaceWith(el);
+  });
+
+  function fill(){
+    document.querySelectorAll("[data-k]").forEach(function(el){
+      var k = el.getAttribute("data-k");
+      if(el.type === "radio") el.checked = String(S[k]) === el.value;
+      else if(el.type === "checkbox") el.checked = !!S[k];
+      else el.value = S[k];
+    });
+  }
+
+  function onEdit(){ fromLink = false; persistLocal(); render(); }
+
+  document.addEventListener("input", function(e){
+    var el = e.target; if(!el.matches || !el.matches("[data-k]")) return;
+    var k = el.getAttribute("data-k");
+    if(el.type === "radio"){ if(el.checked) S[k] = Number(el.value); }
+    else if(el.type === "checkbox") S[k] = el.checked;
+    else if(el.type === "number" || el.type === "range") S[k] = el.value === "" ? 0 : Math.max(num(el.min), num(el.value));
+    else S[k] = el.value;
+    onEdit();
+  });
+  document.addEventListener("change", function(e){
+    var el = e.target;
+    if(el.matches && el.matches("[data-k]") && el.type === "number"){ el.value = S[el.getAttribute("data-k")]; }
+    if(el.matches && el.matches("input[type=radio][data-k], input[type=checkbox][data-k]")){
+      var k = el.getAttribute("data-k");
+      if(el.type === "radio" && el.checked) S[k] = Number(el.value);
+      if(el.type === "checkbox") S[k] = el.checked;
+      onEdit();
+    }
+  });
+  document.addEventListener("click", function(e){
+    var b = e.target.closest && e.target.closest(".stp"); if(!b) return;
+    var k = b.getAttribute("data-for"), input = document.getElementById(k);
+    var v = Math.max(num(input.min), num(S[k]) + num(b.getAttribute("data-d")));
+    S[k] = v; input.value = v; onEdit();
+  });
+
+  /* ---------- render ---------- */
+  function $(id){ return document.getElementById(id); }
+  function rangeHtml(ph){
+    if(!ph.days) return '<div class="range">Не враховано</div><div class="calc">0 годин, етап пропускаємо.</div>';
+    return '<div class="range">'+fmt(ph.start)+'<span class="arr">→</span>'+fmt(ph.end)+'</div>';
+  }
+  function approxW(n, dpw){ return n ? "≈ "+weeks(Math.max(1, Math.round(n/dpw))) : ""; }
+  function formula(h, p, P){
+    var hh = Math.max(0, num(h));
+    var left = P.buf > 1 ? "("+hh+" год + "+Math.round((P.buf-1)*100)+"%)" : hh+" год";
+    return left+" ÷ ("+P.hpd+" год × "+P.ppl(p)+" люд.)";
+  }
+  function line(h, p, n, P){ return formula(h,p,P)+" = "+wdays(n); }
+  function sliderFill(id){ var el = $(id), lo = num(el.min), hi = num(el.max); el.style.setProperty("--p", ((num(el.value)-lo)/(hi-lo)*100)+"%"); }
+
+  function render(){
+    var P = compute(S);
+    var split = Number(S.split) === 1;
+    document.querySelectorAll('[data-mode="total"]').forEach(function(x){ x.hidden = split; });
+    document.querySelectorAll('[data-mode="split"]').forEach(function(x){ x.hidden = !split; });
+    $("pauseDates").hidden = !S.pause;
+    $("bufferOut").textContent = S.buffer + "%";
+    $("overlapOut").textContent = S.overlap + "%";
+    sliderFill("buffer"); sliderFill("overlap");
+
+    var untilAgency = Math.round((P.agency - TODAY)/864e5);
+    $("out-agency").innerHTML = '<div class="range">'+fmt(P.agency, true)+'</div><div class="calc">'+
+      (untilAgency > 0 ? "Через "+untilAgency+" "+pl(untilAgency,["день","дні","днів"])+" від сьогодні." : "Дизайн трьох сторінок уже здано.")+'</div>';
+
+    $("out-design").innerHTML = rangeHtml(P.design) + (P.design.days ? '<div class="calc">'+line(S.designHours, S.designPeople, P.design.days, P)+' '+approxW(P.design.days, P.dpw)+'</div>' : '');
+
+    function devCalc(k, d){
+      if(!split) return '<div class="calc">'+line(S[k+"Total"], S[k+"TotalPeople"], d.all, P)+' '+approxW(d.all, P.dpw)+'</div>';
+      return '<div class="calc">Фронтенд: '+line(S[k+"Fe"], S[k+"FePeople"], d.fe, P)+'</div>'+
+             '<div class="calc">Бекенд: '+line(S[k+"Be"], S[k+"BePeople"], d.be, P)+'</div>'+
+             '<div class="calc">Працюють паралельно, тривалість за довшою частиною: '+wdays(d.len)+' '+approxW(d.len, P.dpw)+'</div>';
+    }
+    $("out-dev1").innerHTML = rangeHtml(P.dev1) + (P.dev1.days ? devCalc("dev1", P.d1) : '');
+
+    var flag = "";
+    if(P.wait > 0) flag = '<span class="flag warn">Команда чекає на дизайн '+wdays(P.wait)+'</span>';
+    else if(P.dev2.days) flag = '<span class="flag good">Стартує одразу, без очікування</span>';
+    var stretch = P.dev2.stretched ? '<div class="calc">Подовжено до дати, коли дизайнер віддасть останні сторінки.</div>' : '';
+    $("out-dev2").innerHTML = rangeHtml(P.dev2) + (P.dev2.days ? devCalc("dev2", P.d2) : '') + stretch + flag;
+
+    $("out-qa").innerHTML = rangeHtml(P.qa) + (P.qa.days ? '<div class="calc">'+line(S.qaHours, S.qaPeople, P.qa.days, P)+' '+approxW(P.qa.days, P.dpw)+'</div>' : '');
+
+    var calWeeks = Math.max(0, Math.round((P.final - TODAY)/864e5/7));
+    var months = Math.round((P.final - TODAY)/864e5/30.4);
+    $("out-final").textContent = fmt(P.final, true);
+    $("out-final-calc").textContent = wdays(P.total)+" після здачі дизайну агенцією. Запас на ризики: "+S.buffer+"%.";
+
+    var big = $("bigDate"), text = fmt(P.final, true);
+    if(big.textContent !== text){
+      big.classList.add("tick"); big.textContent = text;
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ big.classList.remove("tick"); }); });
+    }
+    $("subLine").textContent = "Через "+weeks(calWeeks)+(months >= 2 ? " (≈ "+months+" "+pl(months,["місяць","місяці","місяців"])+")" : "")+" від сьогодні · "+wdays(P.total)+" після агенції";
+    $("mbarDate").textContent = text;
+
+    var ins = $("insight");
+    if(P.wait > 0){
+      ins.className = "note warn";
+      ins.innerHTML = '<span class="lbl">Дату зараз визначає дизайн</span>Розробники закінчать три сторінки і чекатимуть дизайн решти '+wdays(P.wait)+'. Найшвидший спосіб зрушити дату: прискорити дизайнера.';
+    } else if(P.lead > 0){
+      ins.className = "note good";
+      ins.innerHTML = '<span class="lbl">Дату зараз визначає розробка</span>Дизайн решти буде готовий на '+wdays(P.lead)+' раніше, ніж розробники закінчать три сторінки. Ніхто нікого не чекає.';
+    } else {
+      ins.className = "note good";
+      ins.innerHTML = '<span class="lbl">Ідеальний збіг</span>Дизайн решти і розробка трьох сторінок закінчуються майже одночасно. Ніхто нікого не чекає.';
+    }
+
+    renderGantt(P);
+    renderStatus();
+  }
+
+  function renderGantt(P){
+    var t0 = P.agency < TODAY ? P.agency : TODAY;
+    var t1 = add(P.final, 10);
+    var span = t1 - t0;
+    function x(d){ return Math.max(0, Math.min(100, (d - t0)/span*100)); }
+    function bar(a, bEnd, c){ if(!a || !bEnd) return ""; var l = x(a), r = x(add(bEnd,1)); return '<i class="g-bar" style="left:'+l.toFixed(2)+'%;width:'+Math.max(0.6, r-l).toFixed(2)+'%;--c:var('+c+')"></i>'; }
+    var nowX = x(TODAY).toFixed(2);
+    function row(label, inner){ return '<div class="g-row"><span class="g-label">'+label+'</span><div class="g-track">'+inner+'<i class="g-now" style="left:'+nowX+'%" title="Сьогодні"></i></div></div>'; }
+    var ticks = "";
+    var m = new Date(t0.getFullYear(), t0.getMonth()+1, 1, 12);
+    var gap = (t1 - t0)/864e5 > 300 ? 2 : 1, i = 0;
+    while(m < t1){
+      var px = x(m);
+      if(px < 92 && i % gap === 0) ticks += '<span style="left:'+px.toFixed(2)+'%">'+SHORT[m.getMonth()]+(m.getMonth()===0 ? " ’"+String(m.getFullYear()).slice(2) : "")+'</span>';
+      m = new Date(m.getFullYear(), m.getMonth()+1, 1, 12); i++;
+    }
+    var wait = "";
+    if(P.wait > 0){ var wl = x(P.dev1.next), wr = x(P.dev2.start); wait = '<i class="g-wait" style="left:'+wl.toFixed(2)+'%;width:'+(wr-wl).toFixed(2)+'%"></i>'; }
+    $("gantt").innerHTML =
+      '<div class="g-row"><span></span><div class="g-axis">'+ticks+'</div></div>' +
+      row("Агенція", P.agency > TODAY ? bar(TODAY, P.agency, "--c-agency") : bar(P.agency, P.agency, "--c-agency")) +
+      row("Дизайн решти", bar(P.design.start, P.design.end, "--c-design")) +
+      row("Розробка 3 стор.", bar(P.dev1.start, P.dev1.end, "--c-dev")) +
+      row("Розробка решти", wait + bar(P.dev2.start, P.dev2.end, "--c-dev")) +
+      row("Тестування", bar(P.qa.start, P.qa.end, "--c-qa"));
+  }
+
+  /* ---------- plan status ---------- */
+  function when(s){
+    if(!s) return "";
+    var d = /^\d{4}-\d{2}-\d{2}$/.test(s) ? D(s) : new Date(s); if(isNaN(d)) return "";
+    return d.getDate()+" "+GEN[d.getMonth()]+" "+d.getFullYear();
+  }
+  function renderStatus(){
+    var st = $("saveStatus"), rv = $("revert");
+    st.classList.remove("dirty","ok","info");
+    rv.hidden = true;
+    if(!planReady){ st.textContent = "Завантажуємо план…"; return; }
+    var dirty = shared ? isDirty() : false;
+    if(fromLink && dirty){ st.textContent = "Сценарій із посилання. Офіційний план інший."; st.classList.add("info"); rv.hidden = false; }
+    else if(planFailed && !shared){ st.textContent = "Не вдалося завантажити plan.json. Показуємо приклад цифр."; st.classList.add("dirty"); }
+    else if(dirty){ st.textContent = "Ви змінили цифри лише для себе. Щоб оновити план для всіх, оновіть plan.json."; st.classList.add("dirty"); rv.hidden = false; }
+    else { st.textContent = "Офіційний план · оновлено "+when(shared.updatedAt); st.classList.add("ok"); }
+  }
+
+  $("revert").addEventListener("click", function(){
+    if(!shared) return;
+    S = merge(shared.values); fill();
+    try { history.replaceState(null, "", location.pathname); } catch(e){}
+    onEdit();
+  });
+
+  /* ---------- copy helpers ---------- */
+  function copy(text, okMsg){
+    var box = $("copyBox"), btnMsg = okMsg;
+    function fallback(){ box.value = text; box.hidden = false; box.focus(); box.select(); flash("Виділіть текст у полі й скопіюйте його."); }
+    try { navigator.clipboard.writeText(text).then(function(){ box.hidden = true; flash(btnMsg); }, fallback); }
+    catch(e){ fallback(); }
+  }
+  var flashTimer = null;
+  function flash(msg){
+    var st = $("saveStatus");
+    st.classList.remove("dirty","info"); st.classList.add("ok"); st.textContent = msg;
+    clearTimeout(flashTimer); flashTimer = setTimeout(renderStatus, 3500);
+  }
+  $("share").addEventListener("click", function(){
+    var q = new URLSearchParams();
+    KEYS.forEach(function(k){ var v = S[k]; q.set(k, typeof v === "boolean" ? (v ? "1" : "0") : String(v)); });
+    copy(location.origin + location.pathname + "?" + q.toString(), "Посилання скопійовано. Хто його відкриє, побачить саме ці цифри.");
+  });
+  $("copyPlan").addEventListener("click", function(){
+    var body = {
+      _comment: "Офіційний план для сторінки Release roadmap.",
+      updatedAt: ISO(TODAY),
+      values: merge(S)
+    };
+    copy(JSON.stringify(body, null, 2) + "\n", "plan.json скопійовано. Вставте його на GitHub і натисніть Commit changes.");
+  });
+  function ISO(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+
+  /* ---------- phone bar ---------- */
+  try {
+    var io = new IntersectionObserver(function(en){ $("mbar").classList.toggle("on", !en[0].isIntersecting); });
+    io.observe($("resultCard"));
+  } catch(e){}
+
+  fill();
+  render();
+
+  /* ---------- official plan ---------- */
+  fetch("plan.json", {cache:"no-store"}).then(function(r){
+    if(!r.ok) throw new Error(r.status);
+    return r.json();
+  }).then(function(data){
+    shared = {values: merge(data && data.values), updatedAt: (data && data.updatedAt) || ""};
+    // keep a local draft only if it was made on top of this same plan version
+    var keep = fromLink || (hadDraft && draftBase === shared.updatedAt);
+    if(!keep){ S = merge(shared.values); fill(); }
+    planReady = true;
+    if(!fromLink) persistLocal();
+    render();
+  }).catch(function(){
+    planReady = true; planFailed = true; render();
+  });
+})();
+</script>
+</body>
+</html>

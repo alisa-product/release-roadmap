@@ -1,0 +1,32 @@
+{
+  "_comment": "Офіційний план для сторінки Release roadmap. Години поки приклад: замініть їх на оцінки дизайнера й розробників.",
+  "updatedAt": "2026-10-29",
+  "values": {
+    "agencyDate": "2026-11-19",
+    "devStart": "2026-12-01",
+    "designHours": 240,
+    "designPeople": 1,
+    "split": 0,
+    "dev1Total": 480,
+    "dev1TotalPeople": 2,
+    "dev1Fe": 320,
+    "dev1FePeople": 1,
+    "dev1Be": 160,
+    "dev1BePeople": 1,
+    "dev2Total": 960,
+    "dev2TotalPeople": 2,
+    "dev2Fe": 640,
+    "dev2FePeople": 1,
+    "dev2Be": 320,
+    "dev2BePeople": 1,
+    "qaHours": 80,
+    "qaPeople": 1,
+    "hoursPerDay": 8,
+    "daysPerWeek": 5,
+    "buffer": 0,
+    "overlap": 100,
+    "pause": false,
+    "pauseFrom": "2026-12-31",
+    "pauseTo": "2027-01-01"
+  }
+}
