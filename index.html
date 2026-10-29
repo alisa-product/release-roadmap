@@ -84,6 +84,12 @@ a.btn{display:inline-flex;align-items:center;text-decoration:none}
 .bigdate{font-size:clamp(40px,5vw,56px);line-height:1.05;letter-spacing:-.03em;font-weight:500;font-variant-numeric:tabular-nums;transition:opacity .25s ease;margin-top:4px}
 .bigdate.tick{opacity:.35;transition:none}
 .subline{color:var(--fg-2);font-size:14px;margin-top:8px}
+.delta{justify-self:start;display:inline-flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;line-height:18px;border-radius:999px;padding:6px 12px 6px 10px;background:var(--inset);color:var(--fg)}
+.delta::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--disabled);flex:none}
+.delta.warn{background:var(--warning-soft)}
+.delta.warn::before{background:var(--warning)}
+.delta.good{background:var(--success-soft)}
+.delta.good::before{background:var(--success)}
 .note{border-radius:20px;padding:14px 16px;font-size:14px;line-height:20px;margin-top:16px;color:var(--fg)}
 .note.good{background:var(--success-soft)}
 .note.warn{background:var(--warning-soft)}
@@ -437,6 +443,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
         <p class="eyebrow">Платформа з новим дизайном буде готова орієнтовно</p>
         <p class="bigdate" id="bigDate">…</p>
         <p class="subline" id="subLine"></p>
+        <p class="delta" id="delta" hidden></p>
         <div class="note" id="insight"></div>
       </section>
 
@@ -459,7 +466,6 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 
 <script>
 (function(){
-  var LS = "tp-redesign-roadmap-draft";
   var DEFAULTS = {
     agencyDate:"2026-11-19", devStart:"2026-12-01",
     designHours:240, designPeople:1,
@@ -536,7 +542,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   var S = merge(DEFAULTS);
   var shared = null;      // {values, updatedAt} once plan.json is loaded
   var planReady = false, planFailed = false, fromLink = false;
-  var draftBase = null, hadDraft = false;
+  var touched = false;
 
   // a scenario link (?designHours=300&...) wins over a local draft
   function parseLink(){
@@ -549,15 +555,10 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     });
     return any ? o : null;
   }
+  // edits live only in this tab: a reload brings back the official plan (or the scenario link)
   var linked = parseLink();
   if(linked){ S = merge(linked); fromLink = true; }
-  else {
-    try {
-      var raw = localStorage.getItem(LS);
-      if(raw){ var l = JSON.parse(raw); if(l && l.values){ S = merge(l.values); draftBase = l.basedOn || null; hadDraft = true; } }
-    } catch(e){}
-  }
-  function persistLocal(){ try { localStorage.setItem(LS, JSON.stringify({values:S, basedOn: shared ? shared.updatedAt : null})); } catch(e){} }
+  function BASE(){ return shared ? {values: shared.values, label: "в офіційному плані"} : null; }
   function isDirty(){ return shared ? !same(S, shared.values) : true; }
 
   /* ---------- fields ---------- */
@@ -586,7 +587,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     });
   }
 
-  function onEdit(){ fromLink = false; persistLocal(); render(); }
+  function onEdit(){ fromLink = false; touched = true; render(); }
 
   document.addEventListener("input", function(e){
     var el = e.target; if(!el.matches || !el.matches("[data-k]")) return;
@@ -676,6 +677,17 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     $("subLine").textContent = "Через "+weeks(calWeeks)+(months >= 2 ? " (≈ "+months+" "+pl(months,["місяць","місяці","місяців"])+")" : "")+" від сьогодні · "+wdays(P.total)+" після агенції";
     $("mbarDate").textContent = text;
 
+    // how far this viewer's numbers move the date from the plan
+    var base = BASE(), dl = $("delta");
+    if(base && !same(S, base.values)){
+      var f0 = compute(base.values).final, dd = Math.round((P.final - f0)/864e5), ad = Math.abs(dd);
+      var amt = ad >= 7 ? weeks(Math.round(ad/7)) : ad+" "+pl(ad,["день","дні","днів"]);
+      dl.className = "delta" + (dd > 0 ? " warn" : dd < 0 ? " good" : "");
+      dl.textContent = dd === 0 ? "Дата та сама, що "+base.label+" ("+fmt(f0, true)+")"
+        : "На "+amt+(dd > 0 ? " пізніше" : " раніше")+", ніж "+base.label+" ("+fmt(f0, true)+")";
+      dl.hidden = false;
+    } else dl.hidden = true;
+
     var ins = $("insight");
     if(P.wait > 0){
       ins.className = "note warn";
@@ -734,7 +746,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     var dirty = shared ? isDirty() : false;
     if(fromLink && dirty){ st.textContent = "Сценарій із посилання. Офіційний план інший."; st.classList.add("info"); rv.hidden = false; }
     else if(planFailed && !shared){ st.textContent = "Не вдалося завантажити plan.json. Показуємо приклад цифр."; st.classList.add("dirty"); }
-    else if(dirty){ st.textContent = "Ви змінили цифри лише для себе. Щоб оновити план для всіх, оновіть plan.json."; st.classList.add("dirty"); rv.hidden = false; }
+    else if(dirty){ st.textContent = "Ці зміни бачите лише ви. Після оновлення сторінки повернеться офіційний план."; st.classList.add("dirty"); rv.hidden = false; }
     else { st.textContent = "Офіційний план · оновлено "+when(shared.updatedAt); st.classList.add("ok"); }
   }
 
@@ -789,10 +801,9 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   }).then(function(data){
     shared = {values: merge(data && data.values), updatedAt: (data && data.updatedAt) || ""};
     // keep a local draft only if it was made on top of this same plan version
-    var keep = fromLink || (hadDraft && draftBase === shared.updatedAt);
+    var keep = fromLink || touched;
     if(!keep){ S = merge(shared.values); fill(); }
     planReady = true;
-    if(!fromLink) persistLocal();
     render();
   }).catch(function(){
     planReady = true; planFailed = true; render();
