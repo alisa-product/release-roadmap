@@ -271,8 +271,9 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
             <div class="step-head">
               <span class="tag">Змінна X₂ · фронтенд і бекенд</span>
               <h3>Розробка трьох сторінок</h3>
-              <p class="step-note">Верстаємо новий дизайн і адаптуємо бекенд. Частина бекенду вже працює на поточній платформі, тож рахуйте лише нову роботу.</p>
+              <p class="step-note">Ті самі три сторінки, які здає агенція. Верстаємо новий дизайн і адаптуємо бекенд. Частина бекенду вже працює на поточній платформі, тож рахуйте лише нову роботу.</p>
             </div>
+            <div class="chips"><span class="chip">Головна</span><span class="chip">Результати пошуку</span><span class="chip">Сторінка готелю</span></div>
             <div class="fields">
               <div class="field"><label for="devStart">Старт розробки</label><input type="date" id="devStart" data-k="devStart"></div>
               <div class="field">
@@ -283,20 +284,20 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
                 </div>
               </div>
             </div>
-            <div class="sub" data-mode="total">
+            <div class="sub" data-mode="total1">
               <div class="fields">
                 <div data-f="dev1Total|Години (фронт + бек)|год|8|0"></div>
                 <div data-f="dev1TotalPeople|Розробників|люд.|1|1"></div>
               </div>
             </div>
-            <div class="sub" data-mode="split">
+            <div class="sub" data-mode="split1">
               <p class="sub-title">Фронтенд</p>
               <div class="fields">
                 <div data-f="dev1Fe|Години|год|8|0"></div>
                 <div data-f="dev1FePeople|Людей|люд.|1|1"></div>
               </div>
             </div>
-            <div class="sub" data-mode="split">
+            <div class="sub" data-mode="split1">
               <p class="sub-title">Бекенд</p>
               <div class="fields">
                 <div data-f="dev1Be|Години|год|8|0"></div>
@@ -313,22 +314,31 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
             <div class="step-head">
               <span class="tag">Змінна X₂ · фронтенд і бекенд</span>
               <h3>Розробка решти сторінок</h3>
-              <p class="step-note">Стартує, коли виконано дві умови: команда закінчила три сторінки і дизайн решти готовий.</p>
+              <p class="step-note">Розділи з етапу «Дизайн решти сторінок». Стартує, коли виконано дві умови: команда закінчила три сторінки і дизайн решти готовий.</p>
             </div>
-            <div class="sub" data-mode="total">
+            <div class="fields">
+              <div class="field">
+                <span class="flabel">Як рахувати години</span>
+                <div class="seg" role="radiogroup" aria-label="Як рахувати години розробки решти сторінок">
+                  <label><input type="radio" name="split2" value="0" data-k="split2"><span>Разом</span></label>
+                  <label><input type="radio" name="split2" value="1" data-k="split2"><span>Фронт і бек окремо</span></label>
+                </div>
+              </div>
+            </div>
+            <div class="sub" data-mode="total2">
               <div class="fields">
                 <div data-f="dev2Total|Години (фронт + бек)|год|8|0"></div>
                 <div data-f="dev2TotalPeople|Розробників|люд.|1|1"></div>
               </div>
             </div>
-            <div class="sub" data-mode="split">
+            <div class="sub" data-mode="split2">
               <p class="sub-title">Фронтенд</p>
               <div class="fields">
                 <div data-f="dev2Fe|Години|год|8|0"></div>
                 <div data-f="dev2FePeople|Людей|люд.|1|1"></div>
               </div>
             </div>
-            <div class="sub" data-mode="split">
+            <div class="sub" data-mode="split2">
               <p class="sub-title">Бекенд</p>
               <div class="fields">
                 <div data-f="dev2Be|Години|год|8|0"></div>
@@ -453,7 +463,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   var DEFAULTS = {
     agencyDate:"2026-11-19", devStart:"2026-12-01",
     designHours:240, designPeople:1,
-    split:0,
+    split:0, split2:0,
     dev1Total:480, dev1TotalPeople:2, dev1Fe:320, dev1FePeople:1, dev1Be:160, dev1BePeople:1,
     dev2Total:960, dev2TotalPeople:2, dev2Fe:640, dev2FePeople:1, dev2Be:320, dev2BePeople:1,
     qaHours:80, qaPeople:1,
@@ -497,7 +507,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     function ppl(p){ return Math.max(1, Math.round(num(p)) || 1); }
     function dd(h,p){ h = Math.max(0, num(h)); return Math.ceil(h*buf/(hpd*ppl(p)) - 1e-9); }
     function dev(k){
-      if(Number(s.split)===1){ var fe = dd(s[k+"Fe"], s[k+"FePeople"]), be = dd(s[k+"Be"], s[k+"BePeople"]); return {fe:fe, be:be, len:Math.max(fe,be)}; }
+      if(Number(k === "dev1" ? s.split : s.split2)===1){ var fe = dd(s[k+"Fe"], s[k+"FePeople"]), be = dd(s[k+"Be"], s[k+"BePeople"]); return {fe:fe, be:be, len:Math.max(fe,be)}; }
       var all = dd(s[k+"Total"], s[k+"TotalPeople"]); return {all:all, len:all};
     }
     var agency = D(s.agencyDate) || TODAY;
@@ -621,9 +631,11 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
 
   function render(){
     var P = compute(S);
-    var split = Number(S.split) === 1;
-    document.querySelectorAll('[data-mode="total"]').forEach(function(x){ x.hidden = split; });
-    document.querySelectorAll('[data-mode="split"]').forEach(function(x){ x.hidden = !split; });
+    var split1 = Number(S.split) === 1, split2 = Number(S.split2) === 1;
+    document.querySelectorAll("[data-mode]").forEach(function(x){
+      var m = x.getAttribute("data-mode"), on = m.slice(-1) === "1" ? split1 : split2;
+      x.hidden = m.indexOf("split") === 0 ? !on : on;
+    });
     $("pauseDates").hidden = !S.pause;
     $("bufferOut").textContent = S.buffer + "%";
     $("overlapOut").textContent = S.overlap + "%";
@@ -636,7 +648,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     $("out-design").innerHTML = rangeHtml(P.design) + (P.design.days ? '<div class="calc">'+line(S.designHours, S.designPeople, P.design.days, P)+' '+approxW(P.design.days, P.dpw)+'</div>' : '');
 
     function devCalc(k, d){
-      if(!split) return '<div class="calc">'+line(S[k+"Total"], S[k+"TotalPeople"], d.all, P)+' '+approxW(d.all, P.dpw)+'</div>';
+      if(!(k === "dev1" ? split1 : split2)) return '<div class="calc">'+line(S[k+"Total"], S[k+"TotalPeople"], d.all, P)+' '+approxW(d.all, P.dpw)+'</div>';
       return '<div class="calc">Фронтенд: '+line(S[k+"Fe"], S[k+"FePeople"], d.fe, P)+'</div>'+
              '<div class="calc">Бекенд: '+line(S[k+"Be"], S[k+"BePeople"], d.be, P)+'</div>'+
              '<div class="calc">Працюють паралельно, тривалість за довшою частиною: '+wdays(d.len)+' '+approxW(d.len, P.dpw)+'</div>';
