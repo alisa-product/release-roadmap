@@ -464,8 +464,8 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
     agencyDate:"2026-11-19", devStart:"2026-12-01",
     designHours:240, designPeople:1,
     split:0, split2:0,
-    dev1Total:480, dev1TotalPeople:2, dev1Fe:320, dev1FePeople:1, dev1Be:160, dev1BePeople:1,
-    dev2Total:960, dev2TotalPeople:2, dev2Fe:640, dev2FePeople:1, dev2Be:320, dev2BePeople:1,
+    dev1Total:400, dev1TotalPeople:2, dev1Fe:200, dev1FePeople:1, dev1Be:200, dev1BePeople:1,
+    dev2Total:480, dev2TotalPeople:2, dev2Fe:240, dev2FePeople:1, dev2Be:240, dev2BePeople:1,
     qaHours:80, qaPeople:1,
     hoursPerDay:8, daysPerWeek:5, buffer:0, overlap:100,
     pause:false, pauseFrom:"2026-12-31", pauseTo:"2027-01-01"
@@ -723,7 +723,8 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   function when(s){
     if(!s) return "";
     var d = /^\d{4}-\d{2}-\d{2}$/.test(s) ? D(s) : new Date(s); if(isNaN(d)) return "";
-    return d.getDate()+" "+GEN[d.getMonth()]+" "+d.getFullYear();
+    var t = /^\d{4}-\d{2}-\d{2}$/.test(s) ? "" : ", "+pad(d.getHours())+":"+pad(d.getMinutes());
+    return d.getDate()+" "+GEN[d.getMonth()]+" "+d.getFullYear()+t;
   }
   function renderStatus(){
     var st = $("saveStatus"), rv = $("revert");
@@ -765,7 +766,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;bac
   $("copyPlan").addEventListener("click", function(){
     var body = {
       _comment: "Офіційний план для сторінки Release roadmap.",
-      updatedAt: ISO(TODAY),
+      updatedAt: new Date().toISOString(),
       values: merge(S)
     };
     copy(JSON.stringify(body, null, 2) + "\n", "plan.json скопійовано. Вставте його на GitHub і натисніть Commit changes.");
